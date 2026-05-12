@@ -1,0 +1,15 @@
+{
+  "project": "manna-snips",
+  "active_phase": "Phase 1 - Standalone repo and first public release prep",
+  "current_task": "finish GitHub release handoff for manna-snips now that the installer-first lane, screenshots, and local repo surface are ready",
+  "status": "in_progress",
+  "next_focus": [
+    "complete GitHub CLI authentication",
+    "create the public manna-snips repository and push the current tree",
+    "keep the bundled-runtime installer as the preferred public release path",
+    "keep the old direct PyInstaller portable build secondary until its earlier trust question is explicitly cleared"
+  ],
+  "last_updated": "2026-05-12T00:36:00-04:00",
+  "last_mode": "build",
+  "last_request": "/build manna-snips Best next move is a short real human click-through of that refreshed installer plus one or two clean README screenshots/GIF captures. After that, the remaining step is the actual GitHub publish/release handoff, which is the first part that leaves the machine."
+}

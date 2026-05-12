@@ -1,0 +1,17 @@
+# Manna Snips Decision Memory
+
+- `Manna Snips` should stay a copy-first tool; download is explicit.
+- Scratch files are acceptable as disposable implementation detail, but copy should never feel like a hidden save-to-disk action.
+- The public main window should stay simple, obvious, and low-friction.
+- Keep the diamond / crystal family identity, but bias toward subtraction for the shipping surface.
+- For the first public release, prefer the bundled-runtime installer as the main public lane; keep the PyInstaller `onedir` build as a secondary advanced option rather than the default recommendation.
+- Settings and temp should live under local app-data for real user machines, not inside a repo checkout.
+- The standalone repo should be the real source of truth; local workspace launchers should delegate into it rather than keeping a second divergent full app implementation.
+- Frozen builds must resolve helpers and icons through a runtime bundle root instead of assuming the source-tree layout.
+- Fresh-profile testing is part of the shipping workflow; `--profile public-test` is the supported way to test the packaged app like a new user on the same machine.
+- If a packaged launch correlates with system-level power behavior, treat that as a hard release blocker even if smoke tests pass and the shortcut target looks correct.
+- Let users choose their downloads folder inside the app, and let installer-based installs choose their install directory during setup; do not hardcode those experience decisions as if one path fits everyone.
+- Prefer the bundled-runtime installer as the public release lane if the source app is behaving better than the direct portable packaged EXE.
+- For `Manna Snips` installer UX, explicitly show the install-directory page and place the startup-at-boot choice on the welcome screen instead of burying it later.
+- If `Start with Windows` exists, make it reversible from inside the running app too, and launch minimized so startup feels helpful instead of intrusive.
+- For public release assets, prefer real captured app surfaces checked into `docs/screenshots` and keep a reusable capture script in the repo so README visuals can be refreshed without ad-hoc manual grabs.
