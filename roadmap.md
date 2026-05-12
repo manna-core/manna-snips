@@ -11,7 +11,7 @@ Ship `Manna Snips` as a small Windows screenshot utility that is faster and more
 
 ## Current Phase
 
-Phase 1: Standalone repo and first public release prep
+Phase 2: Release hardening and post-release feedback
 
 ## Phase Plan
 
@@ -21,6 +21,7 @@ Phase 1: Standalone repo and first public release prep
 - harden local paths for real user machines
 - add packaging, README, and release notes
 - keep the main screen obvious and low-friction
+Status: complete
 
 ### Phase 2 - Release Hardening
 
@@ -28,6 +29,13 @@ Phase 1: Standalone repo and first public release prep
 - startup or tray decision
 - cleaner release assets and screenshots
 - optional first GitHub release
+Status: in progress
+Current emphasis:
+- live feedback on `v0.1.1`
+- clearer public positioning and launch copy
+- first low-noise discovery loops
+- packaged-launch trust
+- keeping the installer as the honest default public lane
 
 ### Phase 3 - Small Utility Refinement
 

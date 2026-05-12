@@ -2,7 +2,9 @@
 
 Copy-first Windows screenshots with lightweight markup.
 
-`Manna Snips` is built for one fast path:
+`Manna Snips` is a small Windows screenshot tool for people who mostly want to copy screenshots, not manage screenshot files.
+
+It is built for one fast path:
 
 1. Take a snip.
 2. Mark it up if needed.
@@ -10,6 +12,24 @@ Copy-first Windows screenshots with lightweight markup.
 4. Paste it where you need it.
 
 Downloads are explicit. Copy stays temporary.
+
+That makes it especially useful for:
+
+- bug reports and support chats
+- sharing logs, errors, and UI issues in Discord, Slack, Reddit, or email
+- quick screenshots for docs, tickets, and notes
+- anyone who is tired of save-heavy screenshot workflows
+
+## Why It Exists
+
+Most screenshot tools are honest about capture, but not always honest about storage. `Manna Snips` is designed around a simpler promise:
+
+- `Copy` should feel temporary
+- `Download` should be explicit
+- the app should stay local
+- the workflow should stay fast
+
+If you just want to grab part of the screen, draw one arrow, and paste it somewhere, that should be the default path.
 
 ## Preview
 
@@ -19,9 +39,15 @@ Downloads are explicit. Copy stays temporary.
 
 ## Install
 
-Use the Windows installer:
+Download from the [latest release page](https://github.com/manna-core/manna-snips/releases/latest).
 
-- `dist\installer\MannaSnips-0.1.1-Setup.exe`
+Recommended:
+
+- the latest `MannaSnips-*-Setup.exe` installer asset on the release page
+
+Also available:
+
+- portable zip for people who prefer a no-installer lane
 
 The installer:
 
@@ -39,6 +65,16 @@ Inside the app, you can also:
 
 If `Start with Windows` is enabled, `Manna Snips` launches minimized to the taskbar.
 
+## What Makes It Different
+
+- `Copy` does not mean "quietly save another permanent PNG somewhere"
+- `Download` is the only action that creates a durable file on disk
+- the editor is built for quick arrows, boxes, highlights, and markup, not heavyweight design work
+- settings, temp files, and downloads are visible and user-controlled
+- the app is local-first with no account system, sync layer, or telemetry
+
+This is closer to a better snipping tool than a full image editor.
+
 ## Use
 
 1. Open `Manna Snips`.
@@ -55,6 +91,17 @@ Main behavior:
 - `Copy` is temporary and clipboard-first.
 - `Download` is the only path that creates a durable PNG on disk.
 - Scratch files are disposable and cleaned automatically.
+
+## Good Fit
+
+`Manna Snips` is a good fit if you want:
+
+- a simple Windows utility that stays out of the way
+- a fast path from screen region to clipboard
+- lightweight built-in annotation
+- an installable app that does not require you to already have Python
+
+It is not trying to replace full image editors or team screenshot platforms.
 
 ## What It Does
 

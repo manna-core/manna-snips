@@ -2,7 +2,7 @@
 
 ## Summary
 
-`Manna Snips` is now publicly shipped on GitHub with a real `v0.1.1` maintenance release. The bundled-runtime Windows installer is the preferred public path, the portable PyInstaller zip is available as a secondary lane, the repo includes real README screenshots plus reusable asset-capture helpers, and the first post-release hardening pass now adds configurable in-app hotkey presets.
+`Manna Snips` is now publicly shipped on GitHub with a real `v0.1.1` maintenance release. The bundled-runtime Windows installer is the preferred public path, the portable PyInstaller zip is available as a secondary lane, the repo includes real README screenshots plus reusable asset-capture helpers, the first post-release hardening pass now adds configurable in-app hotkey presets, the project now has a written retrospective, and the public README plus repo metadata now explain the actual value proposition much more clearly for strangers landing on the page.
 
 ## Public Release
 
@@ -30,6 +30,22 @@
 
 ## Latest Batch Outcome
 
+- expanded `README.md` so the public page now explains:
+  - who the app is for
+  - what problem it solves
+  - why `copy first` vs `download explicitly` matters
+  - why it is different from a save-heavy screenshot workflow
+- fixed the public install instructions to point at the GitHub releases page instead of a repo-local `dist` path
+- added `docs\launch-plan.md` with:
+  - a lightweight traction plan
+  - current Reddit channel recommendations
+  - current subreddit-rule notes
+  - ready-to-edit draft posts
+  - follow-up discovery ideas like `winget` and AlternativeTo
+- updated live GitHub repo metadata:
+  - description
+  - homepage URL pointing at `releases/latest`
+  - discovery topics including `windows`, `screenshot`, `clipboard`, and `productivity`
 - added configurable capture-hotkey presets directly in the main window
 - the hotkey chip, help line, status text, and smoke output now all reflect the actual configured shortcut instead of a hardcoded `Ctrl+Shift+S`
 - rebinding is preset-based and safe:
@@ -64,6 +80,9 @@
   - installer checksum
   - portable zip
   - portable zip checksum
+- added a project retrospective at:
+  - `D:\Manna-core\projects\manna-snips\docs\retrospective-v0.1.1.md`
+- folded the highest-signal lessons back into project and root decision memory
 
 ## Verification So Far
 
@@ -101,10 +120,21 @@
   - initial push to `main` succeeded
   - GitHub release `v0.1.0` succeeded
   - GitHub release `v0.1.1` succeeded
+- public-page and launch-doc verification:
+  - `gh api repos/manna-core/manna-snips` confirmed the updated public description
+  - `gh api repos/manna-core/manna-snips` confirmed the homepage now points at `releases/latest`
+  - `gh api repos/manna-core/manna-snips` confirmed public topics are now set
+  - README install instructions now point at the real public release surface
 
 ## Remaining Work
 
+- make the first low-noise public post, likely `r/sideprojects`, using the problem-first draft in `docs\launch-plan.md`
+- consider a Wednesday `r/software` post after the first builder-community feedback pass
+- submit `Manna Snips` to `winget`
+- add the app to AlternativeTo
+- decide whether a short README demo GIF is worth the extra upkeep after the current screenshot-based page
 - collect real `v0.1.1` feedback on the new `SHORTCUT` picker
 - keep clean-machine validation and deeper packaged-launch trust work on the follow-up list
 - decide whether the next release should stay in hardening mode or pick up a small additional usability gain
 - keep the bundled-runtime installer as the recommended public path unless the older portable-build trust question is explicitly revisited and cleared
+- reuse the retrospective lessons as the default release/checklist shape for the next small Manna utility

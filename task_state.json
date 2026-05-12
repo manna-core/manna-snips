@@ -1,17 +1,22 @@
 {
   "project": "manna-snips",
   "active_phase": "Phase 2 - First public release and post-release hardening",
-  "current_task": "collect the first real feedback on the public v0.1.1 maintenance release and choose the next hardening target",
+  "current_task": "tighten the public narrative around v0.1.1 and prepare the first low-noise discovery push from a now-clearer GitHub landing page",
   "status": "in_progress",
   "next_focus": [
+    "make the first problem-first public post, likely in r/sideprojects",
+    "watch whether the public README and first launch copy make the app's value obvious to strangers",
     "collect real feedback on the public shortcut picker",
     "watch for whether users need a broader preset list or smarter conflict suggestions",
+    "submit the app to winget",
+    "add the project to AlternativeTo",
     "keep the bundled-runtime installer as the preferred download path",
     "keep the new hotkey picker preset-based and simple unless real user demand proves a more complex editor is worth it",
     "continue clean-machine validation and deeper packaged-launch trust work",
-    "keep the older portable PyInstaller build secondary until its earlier trust question is explicitly revisited and cleared"
+    "keep the older portable PyInstaller build secondary until its earlier trust question is explicitly revisited and cleared",
+    "reuse the retrospective lessons as the default release and cleanup baseline for the next small Manna utility"
   ],
-  "last_updated": "2026-05-12T03:28:00-04:00",
+  "last_updated": "2026-05-12T12:34:00-04:00",
   "last_mode": "build",
-  "last_request": "/build manna-snips works! Best next move is one quick human pass on that installed SHORTCUT flow, then I can cut and publish a small v0.1.1 maintenance release for this hardening pass."
+  "last_request": "/build manna-snips can we add more discriptiion for the public eyes as to what the software does on the github page? and how can we advertise or share this some more?. i was thinking a reddit post or something similar just to get some basic traction"
 }

@@ -16,3 +16,7 @@
 - If `Start with Windows` exists, make it reversible from inside the running app too, and launch minimized so startup feels helpful instead of intrusive.
 - For public release assets, prefer real captured app surfaces checked into `docs/screenshots` and keep a reusable capture script in the repo so README visuals can be refreshed without ad-hoc manual grabs.
 - Keep hotkey rebinding preset-based and in-window unless real user demand proves a freeform shortcut editor is worth the extra complexity and support risk.
+- Keep source, packaged, installed, and test-copy paths visibly distinct during Windows utility development, or cleanup and support drift will get confusing fast.
+- Treat installer smoke installs and public-test shortcuts as temporary validation surfaces; remove or relabel them promptly after they have served their purpose.
+- Public release state should only advance after direct confirmation from the actual tool that performed the push, release, or install action.
+- For public utility repos, explain the everyday problem, the intended user, and the default workflow before the feature list; strangers decide faster from that than from implementation bullets.
