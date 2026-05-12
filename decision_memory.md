@@ -15,3 +15,4 @@
 - For `Manna Snips` installer UX, explicitly show the install-directory page and place the startup-at-boot choice on the welcome screen instead of burying it later.
 - If `Start with Windows` exists, make it reversible from inside the running app too, and launch minimized so startup feels helpful instead of intrusive.
 - For public release assets, prefer real captured app surfaces checked into `docs/screenshots` and keep a reusable capture script in the repo so README visuals can be refreshed without ad-hoc manual grabs.
+- Keep hotkey rebinding preset-based and in-window unless real user demand proves a freeform shortcut editor is worth the extra complexity and support risk.

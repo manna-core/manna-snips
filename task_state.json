@@ -1,15 +1,17 @@
 {
   "project": "manna-snips",
   "active_phase": "Phase 2 - First public release and post-release hardening",
-  "current_task": "stabilize the first public GitHub release and collect the first real post-release usability feedback",
+  "current_task": "collect the first real feedback on the public v0.1.1 maintenance release and choose the next hardening target",
   "status": "in_progress",
   "next_focus": [
-    "validate the public release page and installer flow once more from a real user perspective",
+    "collect real feedback on the public shortcut picker",
+    "watch for whether users need a broader preset list or smarter conflict suggestions",
     "keep the bundled-runtime installer as the preferred download path",
-    "treat configurable hotkeys as the highest-value likely follow-up if real users hit conflicts",
+    "keep the new hotkey picker preset-based and simple unless real user demand proves a more complex editor is worth it",
+    "continue clean-machine validation and deeper packaged-launch trust work",
     "keep the older portable PyInstaller build secondary until its earlier trust question is explicitly revisited and cleared"
   ],
-  "last_updated": "2026-05-12T00:56:21.0667187-04:00",
+  "last_updated": "2026-05-12T03:28:00-04:00",
   "last_mode": "build",
-  "last_request": "/build manna-snips Best next move is a short real human click-through of that refreshed installer plus one or two clean README screenshots/GIF captures. After that, the remaining step is the actual GitHub publish/release handoff, which is the first part that leaves the machine."
+  "last_request": "/build manna-snips works! Best next move is one quick human pass on that installed SHORTCUT flow, then I can cut and publish a small v0.1.1 maintenance release for this hardening pass."
 }

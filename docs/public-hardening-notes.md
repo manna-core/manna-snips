@@ -14,12 +14,12 @@
 - the installer now uses the source app plus a bundled Python runtime instead of depending on the old direct portable EXE as the main launch path
 - the installer now forces the welcome page and install-directory page and exposes `Start with Windows after install` on the welcome screen
 - Windows auto-start now launches minimized instead of throwing the full app open at sign-in
+- the app now exposes a compact preset-based hotkey picker so busy desktops can move off `Ctrl+Shift+S` without editing files or registry values
 - release scripts now emit SHA-256 sidecar files for the public installer and release zip
 - installer staging now rebuilds cleanly each run so stale files do not linger into new release artifacts
 
 ## What Still Needs Care
 
-- hotkey conflicts on busy Windows desktops
 - packaging validation on a clean machine
 - packaged-launch safety after the Explorer/User32 power-off incident
 - README screenshots and friendlier first-run docs

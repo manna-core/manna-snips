@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "manna-snips"
-version = "0.1.0"
+version = "0.1.1"
 description = "Copy-first Windows screenshot tool with lightweight markup"
 readme = "README.md"
 requires-python = ">=3.11"

@@ -21,7 +21,7 @@ Downloads are explicit. Copy stays temporary.
 
 Use the Windows installer:
 
-- `dist\installer\MannaSnips-0.1.0-Setup.exe`
+- `dist\installer\MannaSnips-0.1.1-Setup.exe`
 
 The installer:
 
@@ -31,6 +31,7 @@ The installer:
 
 Inside the app, you can also:
 
+- change the capture hotkey
 - change the downloads folder
 - turn `Start with Windows` on or off later
 - see the install folder
@@ -42,10 +43,12 @@ If `Start with Windows` is enabled, `Manna Snips` launches minimized to the task
 
 1. Open `Manna Snips`.
 2. Leave it open or minimized.
-3. Press `Ctrl+Shift+S`.
+3. Press your capture shortcut. Default: `Ctrl+Shift+S`.
 4. Drag a region.
 5. Copy it back to the clipboard.
 6. Paste with `Ctrl+V`.
+
+If your desktop already uses `Ctrl+Shift+S`, open the app and pick another preset from `SHORTCUT`.
 
 Main behavior:
 
@@ -55,7 +58,7 @@ Main behavior:
 
 ## What It Does
 
-- Global `Ctrl+Shift+S` capture while the app is running
+- Global capture hotkey while the app is running, with in-app preset switching
 - Custom drag-to-select overlay
 - Lightweight built-in editor
 - Pen, highlight, rectangle, and arrow tools

@@ -23,7 +23,7 @@ import winsound
 
 APP_ID = "manna.snips.desktop"
 APP_NAME = "Manna Snips"
-HOTKEY_TEXT = "Ctrl+Shift+S"
+DEFAULT_HOTKEY_TEXT = "Ctrl+Shift+S"
 HOTKEY_ID = 0xA17
 PROFILE_ENV_VAR = "MANNA_SNIPS_PROFILE"
 STARTUP_RUN_KEY = r"Software\Microsoft\Windows\CurrentVersion\Run"
@@ -53,7 +53,7 @@ def resolve_app_version() -> str:
                 return version
         except (OSError, tomllib.TOMLDecodeError):
             pass
-    return "0.1.0"
+    return "0.1.1"
 
 
 def normalize_profile_name(raw: str) -> str:
@@ -84,6 +84,7 @@ LEGACY_OUTPUT_ROOT = (WORKSPACE_ROOT / "outputs" / "manna-snips") if WORKSPACE_R
 
 CREATE_NO_WINDOW = getattr(subprocess, "CREATE_NO_WINDOW", 0)
 
+MOD_ALT = 0x0001
 MOD_CONTROL = 0x0002
 MOD_SHIFT = 0x0004
 WM_HOTKEY = 0x0312
@@ -123,9 +124,44 @@ DEFAULT_SETTINGS = {
     "download_root": str(OUTPUT_ROOT_DEFAULT),
     "last_save_dir": str(OUTPUT_ROOT_DEFAULT),
     "latest_capture": "",
+    "hotkey_combo": DEFAULT_HOTKEY_TEXT,
     "editor_tool": "pen",
     "editor_color": "#3da0ff",
     "editor_width": 6,
+}
+
+HOTKEY_PRESETS = (
+    "Ctrl+Shift+S",
+    "Ctrl+Shift+A",
+    "Ctrl+Shift+X",
+    "Ctrl+Alt+S",
+    "Ctrl+Alt+A",
+    "Ctrl+Alt+X",
+    "Alt+Shift+S",
+    "Alt+Shift+A",
+    "Alt+Shift+X",
+    "F8",
+    "F9",
+    "F10",
+)
+
+HOTKEY_BINDINGS = {
+    "Ctrl+Shift+S": (MOD_CONTROL | MOD_SHIFT, ord("S")),
+    "Ctrl+Shift+A": (MOD_CONTROL | MOD_SHIFT, ord("A")),
+    "Ctrl+Shift+X": (MOD_CONTROL | MOD_SHIFT, ord("X")),
+    "Ctrl+Alt+S": (MOD_CONTROL | MOD_ALT, ord("S")),
+    "Ctrl+Alt+A": (MOD_CONTROL | MOD_ALT, ord("A")),
+    "Ctrl+Alt+X": (MOD_CONTROL | MOD_ALT, ord("X")),
+    "Alt+Shift+S": (MOD_SHIFT | MOD_ALT, ord("S")),
+    "Alt+Shift+A": (MOD_SHIFT | MOD_ALT, ord("A")),
+    "Alt+Shift+X": (MOD_SHIFT | MOD_ALT, ord("X")),
+    "F8": (0, 0x77),
+    "F9": (0, 0x78),
+    "F10": (0, 0x79),
+}
+
+HOTKEY_PRESET_ALIASES = {
+    "".join(char for char in preset.lower() if char.isalnum()): preset for preset in HOTKEY_PRESETS
 }
 
 POWER_SHELL = [
@@ -426,6 +462,16 @@ def clip_text(value: str, max_chars: int = 88) -> str:
     if len(clean) <= max_chars:
         return clean
     return clean[: max_chars - 3].rstrip() + "..."
+
+
+def normalize_hotkey_text(raw: object) -> str:
+    key = "".join(char for char in str(raw or "").lower() if char.isalnum())
+    return HOTKEY_PRESET_ALIASES.get(key, DEFAULT_HOTKEY_TEXT)
+
+
+def get_hotkey_binding(hotkey_text: str) -> tuple[int, int]:
+    normalized = normalize_hotkey_text(hotkey_text)
+    return HOTKEY_BINDINGS[normalized]
 
 
 def default_capture_path(settings: dict[str, object] | None = None) -> Path:
@@ -1330,8 +1376,10 @@ class AnnotationEditorWindow:
 
 
 class GlobalHotkeyListener:
-    def __init__(self, on_hotkey) -> None:
+    def __init__(self, on_hotkey, hotkey_text: str) -> None:
         self.on_hotkey = on_hotkey
+        self.hotkey_text = normalize_hotkey_text(hotkey_text)
+        self.modifiers, self.virtual_key = get_hotkey_binding(self.hotkey_text)
         self.thread: threading.Thread | None = None
         self.ready_event = threading.Event()
         self.thread_id: int | None = None
@@ -1359,8 +1407,7 @@ class GlobalHotkeyListener:
         msg = MSG()
         user32.PeekMessageW(ctypes.byref(msg), None, 0, 0, PM_REMOVE)
 
-        modifiers = MOD_CONTROL | MOD_SHIFT
-        self.registration_ok = bool(user32.RegisterHotKey(None, HOTKEY_ID, modifiers, ord("S")))
+        self.registration_ok = bool(user32.RegisterHotKey(None, HOTKEY_ID, self.modifiers, self.virtual_key))
         if not self.registration_ok:
             self.registration_error = int(kernel32.GetLastError())
             self.ready_event.set()
@@ -1402,6 +1449,10 @@ class MannaSnipsApp:
                 pass
 
         self.settings = load_settings()
+        self.current_hotkey_text = normalize_hotkey_text(self.settings.get("hotkey_combo", DEFAULT_HOTKEY_TEXT))
+        if self.settings.get("hotkey_combo") != self.current_hotkey_text:
+            self.settings["hotkey_combo"] = self.current_hotkey_text
+            save_settings(self.settings)
         cleanup_temp_capture_files()
         self.output_root = ensure_output_root(self.settings)
         self.latest_capture_path = self.load_latest_capture()
@@ -1416,13 +1467,16 @@ class MannaSnipsApp:
 
         self.open_editor_var = tk.BooleanVar(value=bool(self.settings.get("open_editor_after_snip", True)))
         self.start_with_windows_var = tk.BooleanVar(value=is_start_with_windows_enabled())
+        self.hotkey_choice_var = tk.StringVar(value=self.current_hotkey_text)
+        self.hotkey_text_var = tk.StringVar(value=self.current_hotkey_text)
+        self.hotkey_help_var = tk.StringVar(value=self.build_hotkey_help_text())
         self.hotkey_state_var = tk.StringVar(value="ARMING HOTKEY")
         self.file_flow_var = tk.StringVar(value="")
         self.latest_capture_var = tk.StringVar(value="No downloaded snip yet.")
         self.download_root_var = tk.StringVar(value=str(self.output_root))
         self.install_root_var = tk.StringVar(value=str(APP_LAUNCH_ROOT))
         self.data_root_var = tk.StringVar(value=str(STATE_ROOT))
-        self.status_var = tk.StringVar(value="Ready. Press Ctrl+Shift+S from any app to start a real copy-first snip.")
+        self.status_var = tk.StringVar(value=f"Ready. Press {self.current_hotkey_text} from any app to start a real copy-first snip.")
 
         self.build_ui()
         self.refresh_path_display()
@@ -1467,6 +1521,24 @@ class MannaSnipsApp:
         style.configure("ChipHint.TLabel", background=PANEL_ALT, foreground=TEXT_MUTED, font=("Segoe UI", 9))
         style.configure("Body.TCheckbutton", background=PANEL, foreground=TEXT, font=("Segoe UI", 10))
         style.configure("Tool.TRadiobutton", background=PANEL_ALT, foreground=TEXT, font=("Segoe UI", 10))
+        style.configure(
+            "Hotkey.TCombobox",
+            fieldbackground=PANEL_ALT,
+            background=PANEL_ALT,
+            foreground=TEXT,
+            arrowcolor=TEXT,
+            bordercolor=BORDER,
+            lightcolor=BORDER,
+            darkcolor=BORDER,
+            padding=(8, 6),
+        )
+        style.map(
+            "Hotkey.TCombobox",
+            fieldbackground=[("readonly", PANEL_ALT)],
+            foreground=[("readonly", TEXT)],
+            selectbackground=[("readonly", PANEL_ALT)],
+            selectforeground=[("readonly", TEXT)],
+        )
         style.map(
             "Body.TCheckbutton",
             background=[("active", PANEL)],
@@ -1505,6 +1577,10 @@ class MannaSnipsApp:
             background=[("active", "#16293b"), ("disabled", PANEL_ALT)],
             foreground=[("disabled", "#6d83a3")],
         )
+        self.root.option_add("*TCombobox*Listbox*Background", PANEL_ALT)
+        self.root.option_add("*TCombobox*Listbox*Foreground", TEXT)
+        self.root.option_add("*TCombobox*Listbox*selectBackground", ACCENT_SOFT)
+        self.root.option_add("*TCombobox*Listbox*selectForeground", TEXT)
 
         shell = ttk.Frame(self.root, style="Shell.TFrame", padding=18)
         shell.pack(fill="both", expand=True)
@@ -1534,7 +1610,7 @@ class MannaSnipsApp:
 
         status_row = ttk.Frame(shell, style="Shell.TFrame")
         status_row.pack(fill="x", pady=(14, 14))
-        self.build_signal_chip(status_row, "HOTKEY", text=HOTKEY_TEXT, hint="")
+        self.build_signal_chip(status_row, "HOTKEY", textvariable=self.hotkey_text_var, hint="")
         self.build_signal_chip(status_row, "READY", textvariable=self.hotkey_state_var, hint="")
         self.build_signal_chip(status_row, "FLOW", textvariable=self.file_flow_var, hint="")
 
@@ -1573,6 +1649,24 @@ class MannaSnipsApp:
             style="Body.TCheckbutton",
             command=self.on_toggle_start_with_windows,
         ).pack(side="left", padx=(18, 0))
+
+        shortcut_panel = ttk.Frame(main_panel, style="PanelAlt.TFrame", padding=12)
+        shortcut_panel.pack(fill="x", pady=(0, 14))
+        self.decorate_panel(shortcut_panel, PANEL_ALT)
+        ttk.Label(shortcut_panel, text="SHORTCUT", style="State.TLabel").pack(anchor="w")
+        shortcut_row = ttk.Frame(shortcut_panel, style="PanelAlt.TFrame")
+        shortcut_row.pack(fill="x", pady=(10, 0))
+        ttk.Label(shortcut_row, text="Capture Shortcut", style="PanelAlt.TLabel").pack(side="left")
+        ttk.Combobox(
+            shortcut_row,
+            textvariable=self.hotkey_choice_var,
+            values=HOTKEY_PRESETS,
+            state="readonly",
+            width=18,
+            style="Hotkey.TCombobox",
+        ).pack(side="left", padx=(12, 0))
+        ttk.Button(shortcut_row, text="Apply", style="Quiet.TButton", command=self.apply_hotkey_choice).pack(side="left", padx=(10, 0))
+        ttk.Button(shortcut_row, text="Default", style="Quiet.TButton", command=self.restore_default_hotkey).pack(side="left", padx=(10, 0))
 
         latest_panel = ttk.Frame(main_panel, style="PanelAlt.TFrame", padding=12)
         latest_panel.pack(fill="x", pady=(0, 14))
@@ -1623,7 +1717,7 @@ class MannaSnipsApp:
         ).pack(anchor="w", pady=(8, 0))
         ttk.Label(
             status_panel,
-            text="Ctrl+Shift+S anywhere. Ctrl+C copies in editor. Ctrl+D downloads in editor.",
+            textvariable=self.hotkey_help_var,
             style="ChipHint.TLabel",
             wraplength=760,
             justify="left",
@@ -1694,32 +1788,83 @@ class MannaSnipsApp:
         border.pack(side="bottom", fill="x")
         panel.configure(style="Panel.TFrame" if bg_color == PANEL else "PanelAlt.TFrame")
 
-    def register_hotkey(self) -> None:
-        self.hotkey_listener = GlobalHotkeyListener(on_hotkey=self.on_hotkey_signal)
+    def build_hotkey_help_text(self) -> str:
+        return f"{self.current_hotkey_text} anywhere. Ctrl+C copies in editor. Ctrl+D downloads in editor."
+
+    def set_current_hotkey_text(self, hotkey_text: str) -> None:
+        self.current_hotkey_text = normalize_hotkey_text(hotkey_text)
+        self.hotkey_choice_var.set(self.current_hotkey_text)
+        self.hotkey_text_var.set(self.current_hotkey_text)
+        self.hotkey_help_var.set(self.build_hotkey_help_text())
+
+    def register_hotkey(self, *, update_status: bool = True) -> bool:
+        self.hotkey_listener = GlobalHotkeyListener(on_hotkey=self.on_hotkey_signal, hotkey_text=self.current_hotkey_text)
         success = self.hotkey_listener.start()
         self.hotkey_registered = success
         if success:
             self.hotkey_state_var.set("ARMED")
-            self.set_status("Hotkey armed. Press Ctrl+Shift+S anywhere, drag a region, then paste into Manna.")
-            return
+            if update_status:
+                self.set_status(f"Hotkey armed. Press {self.current_hotkey_text} anywhere, drag a region, then paste into Manna.")
+            return True
 
         error_code = self.hotkey_listener.registration_error if self.hotkey_listener else 0
         if error_code == 1409:
             self.hotkey_state_var.set("HOTKEY BUSY")
-            self.set_status("Ctrl+Shift+S is already owned by another app. Take Snip still works.")
-            return
+            if update_status:
+                self.set_status(f"{self.current_hotkey_text} is already owned by another app. Take Snip still works.")
+            return False
 
         self.hotkey_state_var.set("BUTTON ONLY")
-        if error_code:
-            self.set_status(f"Could not register Ctrl+Shift+S. Windows error {error_code}. Take Snip still works.")
-        else:
-            self.set_status("Could not register Ctrl+Shift+S. The app still works through the Take Snip button.")
+        if update_status:
+            if error_code:
+                self.set_status(f"Could not register {self.current_hotkey_text}. Windows error {error_code}. Take Snip still works.")
+            else:
+                self.set_status(f"Could not register {self.current_hotkey_text}. The app still works through the Take Snip button.")
+        return False
 
     def unregister_hotkey(self) -> None:
         if self.hotkey_listener is not None:
             self.hotkey_listener.stop()
             self.hotkey_listener = None
         self.hotkey_registered = False
+
+    def apply_hotkey_choice(self) -> None:
+        selected_hotkey = normalize_hotkey_text(self.hotkey_choice_var.get())
+        previous_hotkey = self.current_hotkey_text
+
+        if selected_hotkey == previous_hotkey:
+            self.set_status(f"{previous_hotkey} is already the capture shortcut.")
+            return
+
+        self.unregister_hotkey()
+        self.set_current_hotkey_text(selected_hotkey)
+        success = self.register_hotkey(update_status=False)
+        error_code = self.hotkey_listener.registration_error if self.hotkey_listener else 0
+        if success:
+            self.settings["hotkey_combo"] = self.current_hotkey_text
+            save_settings(self.settings)
+            self.set_status(f"Capture shortcut changed to {self.current_hotkey_text}.")
+            return
+
+        self.unregister_hotkey()
+        self.set_current_hotkey_text(previous_hotkey)
+        self.register_hotkey(update_status=False)
+        self.settings["hotkey_combo"] = self.current_hotkey_text
+        save_settings(self.settings)
+        if error_code == 1409:
+            self.set_status(f"{selected_hotkey} is already owned by another app. Keeping {previous_hotkey} as the configured shortcut.")
+            return
+        if error_code:
+            self.set_status(f"Could not register {selected_hotkey}. Keeping {previous_hotkey} as the configured shortcut.")
+            return
+        self.set_status(f"Could not register {selected_hotkey}. Keeping {previous_hotkey} as the configured shortcut.")
+
+    def restore_default_hotkey(self) -> None:
+        self.hotkey_choice_var.set(DEFAULT_HOTKEY_TEXT)
+        if self.current_hotkey_text == DEFAULT_HOTKEY_TEXT:
+            self.set_status("Default capture shortcut already active.")
+            return
+        self.apply_hotkey_choice()
 
     def on_hotkey_signal(self) -> None:
         self.hotkey_queue.put("capture")
@@ -1984,13 +2129,14 @@ def run_smoke() -> int:
     ensure_directories()
     settings = load_settings()
     output_root = ensure_output_root(settings)
+    hotkey_text = normalize_hotkey_text(settings.get("hotkey_combo", DEFAULT_HOTKEY_TEXT))
     print(f"APP: {APP_NAME}")
     print(f"VERSION: {APP_VERSION}")
     print(f"PROFILE: {PROFILE_NAME}")
     print(f"FROZEN: {IS_FROZEN_BUILD}")
     print(f"RUNTIME_ROOT: {RUNTIME_ROOT}")
     print(f"APP_LAUNCH_ROOT: {APP_LAUNCH_ROOT}")
-    print(f"HOTKEY: {HOTKEY_TEXT}")
+    print(f"HOTKEY: {hotkey_text}")
     print(f"STARTUP_VALUE_NAME: {STARTUP_VALUE_NAME}")
     print(f"STARTUP_ENABLED: {is_start_with_windows_enabled()}")
     print(f"STARTUP_COMMAND: {get_startup_command()}")

@@ -35,11 +35,11 @@ Ship the first public GitHub-ready version of `Manna Snips` as a small Windows u
 - README is enough for a stranger to run it
 - privacy model is stated clearly
 
-## Nice-To-Have Before First Public Release
+## First Maintenance Release Candidate
 
-- screenshots or short GIF for README
-- configurable hotkey
-- first-pass app icon refinement if needed
+- configurable hotkey rebinding for busy Windows desktops
+- keep installer-first release messaging simple
+- preserve the copy-first model while hardening the real daily-use friction points
 
 ## Not Required For First Release
 
